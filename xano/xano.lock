@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "objects": {
+    "app:auth": {
+      "guid": "4fe67f5a2d319eaaca7996700f27edd8",
+      "canonical": "auth",
+      "canonical_source": "code"
+    },
+    "app:credentialing": {
+      "guid": "e108062b887085f8aaece955176e2a80",
+      "canonical": "credentialing",
+      "canonical_source": "code"
+    },
+    "dbo:applications": {
+      "guid": "6ee4e93583ac8e033dfa1d76c28eeec5"
+    },
+    "dbo:credentialing_events": {
+      "guid": "1c60d048e6493def14376e053f9a8ed3"
+    },
+    "dbo:credentials": {
+      "guid": "5c3492377f20bde510c0f9d9dd5130f1"
+    },
+    "dbo:providers": {
+      "guid": "be0b0deb0fe9562313188dda5c72d4e5"
+    },
+    "dbo:users": {
+      "guid": "157d4a98d979cf04b9ccdb98dfc15229"
+    },
+    "dbo:verifications": {
+      "guid": "81c0a5c2c957b13f4cc9eca97b8bb28c"
+    },
+    "query:auth|GET|me": {
+      "guid": "bfd70d24f92356209c72088852ec320e"
+    },
+    "query:auth|POST|login": {
+      "guid": "d39d74f907baeb484e9c93358362998a"
+    },
+    "query:credentialing|GET|applications": {
+      "guid": "d208c7f01d2b710d85bdff88584bfbbd"
+    },
+    "query:credentialing|GET|applications/{id}": {
+      "guid": "d759cb225f048691f4440a1818f56659"
+    },
+    "query:credentialing|GET|credentials/expiring": {
+      "guid": "a2d9534bd5061af174db90db7b76bb0b"
+    },
+    "query:credentialing|POST|applications/submit": {
+      "guid": "09ad405d9e45805f2cd0eca3da3a00e7"
+    },
+    "query:credentialing|POST|applications/{id}/advance": {
+      "guid": "d10cbedf8b44c777b68edbc471f987de"
+    },
+    "query:credentialing|POST|applications/{id}/verify": {
+      "guid": "bcb2f7ab4696001dbed697962d697332"
+    },
+    "query:credentialing|POST|seed": {
+      "guid": "aa08d6d1300a85a3730ba3bead878743"
+    }
+  }
+}

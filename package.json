@@ -1,0 +1,41 @@
+{
+  "name": "provider-credentialing-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "xano:export": "tsc --noEmit && xanots export ./xano/index.ts --out workspace.json",
+    "xano:deploy": "npm run build && xanots deploy ./xano/index.ts --static ./frontend/dist",
+    "xano:check": "tsc --noEmit && xanots export ./xano/index.ts --out workspace.json --frozen-lock",
+    "xano:test": "xanots test run-all"
+  },
+  "dependencies": {
+    "@xanots/sdk": ">=0.0.17 <0.1.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
+    "radix-ui": "^1.6.7",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwind-merge": "^3.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.5",
+    "@types/node": "^20.19.43",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "tailwindcss": "^4.1.5",
+    "tsx": "^4.19.2",
+    "tw-animate-css": "^1.2.4",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
+  },
+  "engines": {
+    "node": ">=20.19"
+  }
+}

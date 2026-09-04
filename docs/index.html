@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Provider Credentialing Workflow — a governed Xano backend</title>
+    <meta
+      name="description"
+      content="A governed Xano backend for healthcare provider credentialing: a guarded state machine, API-layer RBAC, a verification gate, an expiry rule, and an audit trail."
+    />
+    <style>
+      :root {
+        --bg: #0a0a0b;
+        --panel: #141417;
+        --panel-2: #1b1b1f;
+        --border: #2a2a30;
+        --text: #ededef;
+        --muted: #a1a1aa;
+        --primary: #f4f4f5;
+        --accent: #7dd3fc;
+        --green: #6ee7b7;
+        --amber: #fcd34d;
+        --red: #fca5a5;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: radial-gradient(1200px 600px at 50% -10%, #16181d 0%, var(--bg) 60%);
+        color: var(--text);
+        font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+      header.hero { text-align: center; padding: 72px 20px 8px; }
+      .kicker {
+        display: inline-flex; gap: 8px; align-items: center;
+        font-size: 13px; color: var(--muted);
+        border: 1px solid var(--border); border-radius: 999px;
+        padding: 5px 12px; margin-bottom: 18px;
+      }
+      .kicker .dot { width: 7px; height: 7px; border-radius: 999px; background: var(--accent); }
+      h1 { font-size: 40px; line-height: 1.1; margin: 8px 0 10px; letter-spacing: -0.02em; }
+      .tagline { color: var(--muted); font-size: 18px; max-width: 640px; margin: 0 auto; }
+      .meta { color: var(--muted); font-size: 14px; margin: 18px 0 22px; }
+      .meta b { color: var(--text); font-weight: 600; }
+      .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 11px 20px; border-radius: 10px; font-weight: 600; font-size: 15px;
+        text-decoration: none; border: 1px solid transparent; transition: all 0.15s ease;
+      }
+      .btn.primary { background: var(--primary); color: #0a0a0b; }
+      .btn.primary:hover { background: #fff; transform: translateY(-1px); }
+      .btn.ghost { border-color: var(--border); color: var(--text); }
+      .btn.ghost:hover { background: var(--panel-2); border-color: #3a3a42; }
+      .shot {
+        margin: 40px auto 8px; max-width: 900px;
+        border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+        box-shadow: 0 24px 60px -30px rgba(0,0,0,0.8);
+      }
+      .shot img { display: block; width: 100%; height: auto; }
+      section { padding: 40px 0; border-top: 1px solid var(--border); margin-top: 40px; }
+      section:first-of-type { border-top: none; }
+      h2 { font-size: 24px; letter-spacing: -0.01em; margin: 0 0 18px; }
+      p.lead { color: var(--muted); max-width: 700px; }
+      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+      .card h3 { margin: 0 0 6px; font-size: 16px; }
+      .card p { margin: 0; color: var(--muted); font-size: 14px; }
+      .card .tag { font-size: 12px; color: var(--accent); font-weight: 600; }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+      th { color: var(--muted); font-weight: 600; }
+      td code { color: var(--accent); }
+      .verb { font-weight: 700; font-size: 12px; color: var(--muted); white-space: nowrap; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+      pre {
+        background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+        padding: 16px; overflow-x: auto; font-size: 13px; color: var(--text);
+      }
+      .note { background: var(--panel-2); border: 1px solid var(--border); border-left: 3px solid var(--amber); border-radius: 10px; padding: 14px 16px; color: var(--muted); font-size: 14px; }
+      footer { text-align: center; color: var(--muted); font-size: 13px; padding: 40px 20px 60px; border-top: 1px solid var(--border); margin-top: 40px; }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <div class="kicker"><span class="dot"></span> Backend Modernization · Healthcare</div>
+        <h1>Provider Credentialing Workflow</h1>
+        <p class="tagline">
+          A governed Xano backend where a healthcare credentialing case moves
+          through an enforced lifecycle, and illegal moves, unverified approvals,
+          and expired credentials are all blocked at the API layer.
+        </p>
+        <p class="meta"><b>6 tables</b> · <b>9 API endpoints</b> · <b>3 governed rules</b></p>
+        <div class="hero-actions">
+          <a class="btn primary" href="https://github.com/xano-scratch/provider-credentialing-workflow">View on GitHub</a>
+          <a class="btn ghost" href="#use">Use this template</a>
+        </div>
+      </div>
+    </header>
+
+    <div class="wrap">
+      <div class="shot">
+        <img src="screenshot.png" alt="The committee view of a case whose approval is blocked by an expired credential, showing the rule that fired and the append-only audit trail." />
+      </div>
+
+      <section>
+        <h2>What it demonstrates</h2>
+        <p class="lead">
+          A credentialing case is the kind of workflow a health system holds in a
+          legacy app today: a state machine, role checks, verification gates, and
+          expiry rules, tangled into a client nobody wants to touch. Here those
+          rules are the endpoints, in one API layer an evaluator can read and trust.
+        </p>
+        <div class="grid" style="margin-top: 22px;">
+          <div class="card">
+            <div class="tag">State machine</div>
+            <h3>Allowed moves only</h3>
+            <p>Submitted, verification, committee review, approved or denied, then re-credential. Any other move is rejected and logged.</p>
+          </div>
+          <div class="card">
+            <div class="tag">Verification gate</div>
+            <h3>No review without proof</h3>
+            <p>A case cannot enter committee review until every active credential has a verified primary-source record.</p>
+          </div>
+          <div class="card">
+            <div class="tag">Expiry rule</div>
+            <h3>Expired blocks approval</h3>
+            <p>A credential within 30 days is flagged, and an already-expired one blocks the case from being approved.</p>
+          </div>
+          <div class="card">
+            <div class="tag">API-layer RBAC</div>
+            <h3>Roles at the endpoint</h3>
+            <p>Coordinator, committee, and viewer are checked with s.precondition in each endpoint. Not row-level security.</p>
+          </div>
+          <div class="card">
+            <div class="tag">Audit trail</div>
+            <h3>Every move, append-only</h3>
+            <p>Each move and each blocked move writes one row, so the case history reads as a governed record.</p>
+          </div>
+          <div class="card">
+            <div class="tag">One contract</div>
+            <h3>Typed end to end</h3>
+            <p>The React frontend derives every path and type from the query defs. Change a def and it fails to compile until it matches.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>API surface</h2>
+        <p class="lead">Two groups: <code>api:auth</code> and <code>api:credentialing</code>.</p>
+        <table style="margin-top: 18px;">
+          <thead>
+            <tr><th>Method</th><th>Path</th><th>What it enforces</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="verb">POST</td><td><code>/api:auth/login</code></td><td>Verifies the password, mints a bearer token.</td></tr>
+            <tr><td class="verb">GET</td><td><code>/api:auth/me</code></td><td>The current caller and their role.</td></tr>
+            <tr><td class="verb">POST</td><td><code>/api:credentialing/seed</code></td><td>Idempotent demo data. Public, so the demo can be reset.</td></tr>
+            <tr><td class="verb">GET</td><td><code>/api:credentialing/applications</code></td><td>Every case with its provider. Any signed-in role.</td></tr>
+            <tr><td class="verb">GET</td><td><code>/api:credentialing/applications/{id}</code></td><td>One case with credentials, verifications, and the audit trail.</td></tr>
+            <tr><td class="verb">POST</td><td><code>/api:credentialing/applications/submit</code></td><td>Coordinator opens a case.</td></tr>
+            <tr><td class="verb">POST</td><td><code>/api:credentialing/applications/{id}/verify</code></td><td>Coordinator records a primary-source verification.</td></tr>
+            <tr><td class="verb">POST</td><td><code>/api:credentialing/applications/{id}/advance</code></td><td>The governed core: state machine, gate, expiry, role guard. Logs the move or the block.</td></tr>
+            <tr><td class="verb">GET</td><td><code>/api:credentialing/credentials/expiring</code></td><td>Credentials expiring within 30 days or already past.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>The screens</h2>
+        <div class="grid">
+          <div class="card"><h3>Sign in</h3><p>One click per seeded role (coordinator, committee, viewer) to see the role-gated actions change.</p></div>
+          <div class="card"><h3>Applications</h3><p>Every case with its provider, specialty, and current status.</p></div>
+          <div class="card"><h3>Case detail</h3><p>Credentials with expiry flags, verification status, the role-gated actions, and the growing audit trail. A blocked move shows its reason inline.</p></div>
+          <div class="card"><h3>Expiring credentials</h3><p>The governance view: what is expiring soon or already past, and driving the approval block.</p></div>
+        </div>
+      </section>
+
+      <section id="use">
+        <h2>Use this template</h2>
+        <p class="lead">
+          Point an AI coding agent at this repository and ask it to start from the
+          template, then adapt the tables and endpoints to your domain:
+        </p>
+        <pre>Start from the XanoTS template at
+https://github.com/xano-scratch/provider-credentialing-workflow
+
+Clone it, run npm install, then `npx xanots login` and
+`npm run xano:deploy` to get a live backend and frontend.
+Then adapt the tables and the governed endpoints in xano/ to my use case,
+keeping the state machine, the API-layer role checks, and the audit trail.</pre>
+        <p class="lead" style="margin-top: 18px;">Or run it yourself:</p>
+        <pre>git clone https://github.com/xano-scratch/provider-credentialing-workflow.git
+cd provider-credentialing-workflow
+npm install
+npx xanots login
+npm run xano:deploy</pre>
+        <p class="note">
+          The live preview links shared elsewhere point at an ephemeral Xano
+          environment that expires. Re-deploy with <code>npm run xano:deploy</code>
+          for fresh links. The durable artifact is this repository, which anyone
+          can clone and deploy.
+        </p>
+      </section>
+    </div>
+
+    <footer>
+      Provider Credentialing Workflow · a XanoTS proof artifact ·
+      Backend Modernization for healthcare
+    </footer>
+  </body>
+</html>

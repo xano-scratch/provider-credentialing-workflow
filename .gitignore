@@ -1,0 +1,11 @@
+node_modules/
+dist/
+workspace.json
+.xano/
+.env
+.env.local
+*.local
+
+# Not ignored, on purpose: xano/xano.lock pins object identity and public URLs
+# across renames and environments. Every build writes it. Commit it — ignoring
+# it means each build mints identities that are thrown away and re-invented.
